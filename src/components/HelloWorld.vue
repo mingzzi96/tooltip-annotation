@@ -14,7 +14,7 @@
       <div class="button_group">
         <button type="button">삭제</button>
         <button type="button">취소</button>
-        <button type="button">저장</button>
+        <button type="button" @click="save">저장</button>
       </div>
     </div>
   </div>
@@ -31,6 +31,11 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
+    save() {
+      this.canvas.createAnnotationBubble();
+    },
   },
   mounted() {
     this.canvas = new Canvas();
