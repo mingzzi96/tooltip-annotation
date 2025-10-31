@@ -148,33 +148,40 @@ class Canvas {
   }
 
   /**
-   * 저장된 위치에 텍스트 없는 SVG 말풍선 생성
+   * 클릭 위치에 comment_bubble.svg 이미지로 말풍선 표시
    */
   createAnnotationBubble() {
     if (!this.imgCanvas) return;
 
-    // input 닫음
-    this.hideAnnotationInput();
-
     const canvasRect = this.imgCanvas.getBoundingClientRect();
-    const bubbleWidth = 150; // 말풍선 가로
-    const bubbleHeight = 60; // 말풍선 세로
-    const offset = 10; // 마우스와 꼬리 사이 거리
+    const offset = 10; // 마우스와 말풍선 사이 거리
 
+    // 이미지 요소 생성
+    const bubble = document.createElement("img");
+    bubble.src = "/comment_bubble.svg"; // public 폴더 기준 경로
+    bubble.style.position = "absolute";
+    bubble.style.zIndex = 1000;
+    bubble.style.display = "block";
+
+    // 일단 화면에 추가해서 크기 계산
+    document.body.appendChild(bubble);
+    const bubbleWidth = bubble.offsetWidth;
+    const bubbleHeight = bubble.offsetHeight;
+
+    // 좌우 위치 계산
     let left = canvasRect.left + this.clickedPosition.x;
-    let top = canvasRect.top + this.clickedPosition.y;
-
-    // 좌우 위치 조정
     if (left + bubbleWidth > canvasRect.right) {
       left = canvasRect.left + this.clickedPosition.x - bubbleWidth;
     } else if (left < canvasRect.left) {
       left = canvasRect.left;
     }
 
-    // 상하 위치 조정
-    top = canvasRect.top + this.clickedPosition.y + offset; // 기본 아래쪽
+    // 상하 위치 계산
+    let top = canvasRect.top + this.clickedPosition.y + offset; // 기본 아래쪽
+    let tailDirection = "down";
     if (top + bubbleHeight > canvasRect.bottom) {
       top = canvasRect.top + this.clickedPosition.y - bubbleHeight - offset; // 위쪽으로 전환
+      tailDirection = "up";
     }
 
     // 최종 클램프
@@ -182,53 +189,15 @@ class Canvas {
     if (top + bubbleHeight > canvasRect.bottom - offset)
       top = canvasRect.bottom - bubbleHeight - offset;
 
-    // SVG 생성
-    const svgns = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgns, "svg");
-    svg.setAttribute("width", bubbleWidth);
-    svg.setAttribute("height", bubbleHeight + 15); // 꼬리 공간 포함
-    svg.style.position = "absolute";
-    svg.style.left = `${left}px`;
-    svg.style.top = `${top}px`;
-    svg.style.zIndex = 1000;
-
-    // 말풍선 배경
-    const rect = document.createElementNS(svgns, "rect");
-    rect.setAttribute("x", 0);
-    rect.setAttribute("y", 0);
-    rect.setAttribute("rx", 10);
-    rect.setAttribute("ry", 10);
-    rect.setAttribute("width", bubbleWidth);
-    rect.setAttribute("height", bubbleHeight);
-    rect.setAttribute("fill", "#fff");
-    rect.setAttribute("stroke", "#333");
-    rect.setAttribute("stroke-width", 2);
-    svg.appendChild(rect);
-
-    // 꼬리 (triangle)
-    const tail = document.createElementNS(svgns, "polygon");
-    const tailWidth = 12;
-    const tailHeight = 10;
-    const tailX = bubbleWidth / 2 - tailWidth / 2;
-    let tailY = bubbleHeight; // 기본 아래쪽 꼬리
-
-    // 위쪽이면 꼬리 방향 변경
-    if (top < canvasRect.top + this.clickedPosition.y) {
-      tailY = -tailHeight;
+    // 꼬리 위치에 맞춰 말풍선 위치 조정
+    if (tailDirection === "down") {
+      top = canvasRect.top + this.clickedPosition.y - bubbleHeight; // 꼬리 아래쪽으로 붙도록
+    } else {
+      top = canvasRect.top + this.clickedPosition.y; // 꼬리 위쪽으로 붙도록
     }
 
-    tail.setAttribute(
-      "points",
-      `${tailX},${tailY} ${tailX + tailWidth},${tailY} ${
-        tailX + tailWidth / 2
-      },${tailY === bubbleHeight ? tailY + tailHeight : tailY - tailHeight}`
-    );
-    tail.setAttribute("fill", "#fff");
-    tail.setAttribute("stroke", "#333");
-    tail.setAttribute("stroke-width", 2);
-    svg.appendChild(tail);
-
-    document.body.appendChild(svg);
+    bubble.style.left = `${left}px`;
+    bubble.style.top = `${top}px`;
   }
 
   // ####################################################################################

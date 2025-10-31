@@ -13,7 +13,7 @@
       />
       <div class="button_group">
         <button type="button">삭제</button>
-        <button type="button">취소</button>
+        <button type="button" @click="cancel">취소</button>
         <button type="button" @click="save">저장</button>
       </div>
     </div>
@@ -33,6 +33,9 @@ export default {
     return {};
   },
   methods: {
+    cancel() {
+      this.canvas.hideAnnotationInput();
+    },
     save() {
       this.canvas.createAnnotationBubble();
     },
