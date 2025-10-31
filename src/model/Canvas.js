@@ -109,7 +109,7 @@ class Canvas {
 
     const inputWidth = el.offsetWidth;
     const inputHeight = el.offsetHeight;
-    const offset = 5; // 마우스와 div 사이 간격
+    // const offset = 5; // 마우스와 div 사이 간격
 
     let left = canvasRect.left + mouseX;
     let top;
@@ -124,12 +124,12 @@ class Canvas {
 
     // 상하 위치 조정
     // 기본: 아래쪽, input 상단이 마우스 아래에 붙도록 inputHeight만큼 이동
-    top = canvasRect.top + mouseY + inputHeight + offset;
+    top = canvasRect.top + mouseY;
 
     // 아래로 넘치면 위쪽으로 전환
     if (top + inputHeight > canvasRect.bottom) {
       // input 하단이 마우스 위쪽에 붙도록
-      top = canvasRect.top + mouseY;
+      top = canvasRect.top - inputHeight + mouseY;
     }
 
     // 최종 클램프: 캔버스 안으로 제한
