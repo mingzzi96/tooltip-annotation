@@ -1,6 +1,6 @@
 <template>
   <div id="hello">
-    <h1>PANZOOM * CANVAS</h1>
+    <h1>PANZOOM * CANVAS = bubbleAnnotation</h1>
     <div class="image_canvas_wrap">
       <canvas ref="image_canvas" class="image_canvas"></canvas>
     </div>
@@ -31,7 +31,7 @@ import Canvas from "@/model/Canvas";
 import Panzoom from "@panzoom/panzoom";
 
 export default {
-  name: "HelloWorld",
+  name: "bubbleAnnotation",
   props: {
     msg: String,
   },

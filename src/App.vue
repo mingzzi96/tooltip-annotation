@@ -1,14 +1,14 @@
 <template>
-  <HelloWorld msg="Welcome to Your Vue.js App" />
+  <bubbleAnnotation msg="Welcome to Your Vue.js App" />
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import bubbleAnnotation from "./components/bubbleAnnotation.vue";
 
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    bubbleAnnotation,
   },
 };
 </script>
