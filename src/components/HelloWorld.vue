@@ -17,6 +17,12 @@
         <button type="button" @click="save">저장</button>
       </div>
     </div>
+    <img
+      ref="comment_bubble"
+      src="/comment_bubble.svg"
+      class="comment_bubble"
+      style="display: none"
+    />
   </div>
 </template>
 
@@ -37,7 +43,7 @@ export default {
       this.canvas.hideAnnotationInput();
     },
     save() {
-      this.canvas.createAnnotationBubble();
+      this.canvas.createAnnotationBubble(this.$refs.comment_bubble);
     },
   },
   mounted() {
@@ -75,5 +81,13 @@ export default {
 canvas {
   width: 100%;
   height: 100%;
+}
+
+.comment_bubble {
+  position: absolute;
+  z-index: 1000;
+  transform-origin: center center;
+  pointer-events: none;
+  user-select: none;
 }
 </style>

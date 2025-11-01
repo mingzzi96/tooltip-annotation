@@ -2,13 +2,15 @@ class Canvas {
   constructor() {
     this.infos = [];
     this.imgCanvas;
-    this.input_bubble;
+    this.inputBubble;
+    this.commentBubble;
+    this.bubbleList = [];
     this.clickedPosition = { x: 0, y: 0 };
   }
 
   imgLoad(url, input, infos) {
     this.infos = infos;
-    this.input_bubble = input;
+    this.inputBubble = input;
 
     if (this.originImgResize) {
       this.originImgResize.onload = null;
@@ -100,10 +102,10 @@ class Canvas {
    * 클릭 위치에 input 입력 영역 띄우기
    */
   showAnnotationInput(mouseX, mouseY) {
-    if (!this.input_bubble || !this.imgCanvas) return;
+    if (!this.inputBubble || !this.imgCanvas) return;
 
     const canvasRect = this.imgCanvas.getBoundingClientRect();
-    const el = this.input_bubble;
+    const el = this.inputBubble;
     el.style.position = "absolute";
     el.style.display = "block";
 
@@ -143,61 +145,61 @@ class Canvas {
   }
 
   hideAnnotationInput() {
-    const el = this.input_bubble;
+    const el = this.inputBubble;
     el.style.display = "none";
   }
 
   /**
-   * 클릭 위치에 comment_bubble.svg 이미지로 말풍선 표시
+   * 클릭 위치에 버블(말풍선) 고정시키기
    */
-  createAnnotationBubble() {
-    if (!this.imgCanvas) return;
+  createAnnotationBubble(commentBubble) {
+    this.commentBubble = commentBubble;
+    console.log(this.commentBubble);
+    if (!this.imgCanvas || !this.commentBubble) return;
+
+    this.hideAnnotationInput();
 
     const canvasRect = this.imgCanvas.getBoundingClientRect();
-    const offset = 10; // 마우스와 말풍선 사이 거리
 
-    // 이미지 요소 생성
-    const bubble = document.createElement("img");
-    bubble.src = "/comment_bubble.svg"; // public 폴더 기준 경로
-    bubble.style.position = "absolute";
-    bubble.style.zIndex = 1000;
-    bubble.style.display = "block";
+    // 원본 ref에서 복제 (스타일 포함)
+    const bubble = this.commentBubble.cloneNode(true);
+    bubble.style.display = "block"; // 얘는 필요 — 원본이 display:none이니까
 
-    // 일단 화면에 추가해서 크기 계산
+    // 화면에 추가
     document.body.appendChild(bubble);
-    const bubbleWidth = bubble.offsetWidth;
-    const bubbleHeight = bubble.offsetHeight;
 
-    // 좌우 위치 계산
-    let left = canvasRect.left + this.clickedPosition.x;
+    const bubbleWidth = 50;
+    const bubbleHeight = 50;
+
+    console.log(bubbleWidth);
+    console.log(bubbleHeight);
+
+    let left = canvasRect.left + bubbleWidth / 2 + this.clickedPosition.x;
+    let top = canvasRect.top - bubbleHeight / 2 + this.clickedPosition.y;
+
+    let transform = "";
+    // let transformOrigin = "center center";
+
+    // 좌우 반전
     if (left + bubbleWidth > canvasRect.right) {
-      left = canvasRect.left + this.clickedPosition.x - bubbleWidth;
-    } else if (left < canvasRect.left) {
-      left = canvasRect.left;
+      transform += " scaleX(-1)";
+      left -= bubbleWidth; // 오른쪽 반전 보정
     }
 
-    // 상하 위치 계산
-    let top = canvasRect.top + this.clickedPosition.y + offset; // 기본 아래쪽
-    let tailDirection = "down";
-    if (top + bubbleHeight > canvasRect.bottom) {
-      top = canvasRect.top + this.clickedPosition.y - bubbleHeight - offset; // 위쪽으로 전환
-      tailDirection = "up";
+    // 상하 반전 (위쪽 경계 벗어나면 반전)
+    if (top < canvasRect.top) {
+      transform += " scaleY(-1)";
+      top += bubbleHeight; // 위쪽 반전 보정
     }
 
-    // 최종 클램프
-    if (top < canvasRect.top + offset) top = canvasRect.top + offset;
-    if (top + bubbleHeight > canvasRect.bottom - offset)
-      top = canvasRect.bottom - bubbleHeight - offset;
-
-    // 꼬리 위치에 맞춰 말풍선 위치 조정
-    if (tailDirection === "down") {
-      top = canvasRect.top + this.clickedPosition.y - bubbleHeight; // 꼬리 아래쪽으로 붙도록
-    } else {
-      top = canvasRect.top + this.clickedPosition.y; // 꼬리 위쪽으로 붙도록
-    }
+    // 클릭 위치 기준 중앙 보정
+    left -= bubbleWidth * 0.5;
+    top -= bubbleHeight * 0.5;
 
     bubble.style.left = `${left}px`;
     bubble.style.top = `${top}px`;
+    bubble.style.transform = transform.trim();
+    bubble.style.transformOrigin = "center center";
   }
 
   // ####################################################################################
